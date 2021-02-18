@@ -2,103 +2,72 @@ import os
 from PIL import Image
 
 
+def get_files_names(dir_path):
+
+    files_names_list = os.listdir(dir_path)
+    return files_names_list
+
+
 def open_images(dir_path):
     # wczytywanie obrazków
-    print("")
 
-    try:
-        file_names_list = os.listdir(dir_path)
-    except FileNotFoundError:
-        print("Podana ścieżka jest nieprawidłowa.")
-    else:
-        opened_images_list = []
+    opened_images_list = []
 
-        for file_name in file_names_list:
+    for file_name in get_files_names(dir_path):
             file_path = dir_path + file_name
             opened_image = Image.open(file_path)
             opened_images_list.append(opened_image)
 
-        return opened_images_list
+    return opened_images_list
 
 
-def get_files_names(dir_path):
+def calculate_size(image, choice, percent):
 
-    try:
-        files_names_list = os.listdir(dir_path)
-    except FileNotFoundError:
-        print("Podaj poprawną ścieżkę.")
-    else:
-        return files_names_list
-
-
-def decrease_images(images_list, files_names, dir_path):
-    # zmniejszanie obrazków
-
-    percent = input("Wpisz liczbę procentów, o jakie ma się zmniejszyć lub zwiększyć obrazek: ")
-    for i in range(0, len(images_list)):
-        # image.show() # otwieranie obrazków w przeglądarce zdjęć
-        image = images_list[i]
-        file_name = files_names[i]
-        print(image) # wypisanie danych obrazka
-        print("Original width: " + str(image.width))
-        print("Original height: " + str(image.height))
-        new_width = int(image.width - (image.width * (int(percent)/100)))
+    if choice == str(1):
+        new_width = int(image.width - (image.width * (int(percent) / 100)))
         new_height = int(image.height - (image.height * (int(percent) / 100)))
-        small_image = image.resize((new_width, new_height))
-        print("New width: " + str(new_width))
-        print("New height: " + str(new_height))
-        new_file_path = dir_path + 'new_' + file_name
-        small_image.save(new_file_path)
-        print("Zapisano " + file_name)
+        new_size = (new_width, new_height)
+        return new_size
 
-
-def increase_images(images_list, files_names, dir_path):
-    # zwiększanie obrazków
-
-    percent = input("Wpisz liczbę procentów, o jakie ma się zmniejszyć lub zwiększyć obrazek: ")
-    for i in range (0, len(images_list)):
-        # image.show() # otwieranie obrazków w przeglądarce zdjęć
-        image = images_list[i]
-        file_name = files_names[i]
-        print(image)  # wypisanie danych obrazka
-        print("Original width: " + str(image.width))
-        print("Original height: " + str(image.height))
+    if choice == str(2):
         new_width = int(image.width + (image.width * (int(percent) / 100)))
         new_height = int(image.height + (image.height * (int(percent) / 100)))
-        big_image = image.resize((new_width, new_height))
-        print("New width: " + str(new_width))
-        print("New height: " + str(new_height))
-        new_file_path = dir_path + 'new_' + file_name
-        big_image.save(new_file_path)
-        print("Zapisano " + file_name)
+        new_size = (new_width, new_height)
+        return new_size
 
 
-def main():                      # definicja funkcji main
-    # wywołanie moich funkcji
+def resize_image(image, choice, percent, new_size):
+    # zmniejszanie obrazków
+        print("Original width: {}; Original height: {}".format(str(image.width), str(image.height)))
+        print("New width: " + str(new_size[0]) + "; New height: " + str(new_size[1]))
+        new_image = image.resize(new_size)
+        return new_image
+
+
+def save_image(file_name, dir_path, new_image):
+        new_file_path = "{}new_{}".format(dir_path, file_name)
+        new_image.save(new_file_path)
+        print("Zapisano {}".format(file_name))
+
+
+def main():
 
     dir_path = input("Podaj ścieżkę dostępu do folderu: ") + "\\"
-    # dir_path = 'C:\\Users\\Marta\\Desktop\\python_projekty\\obrazki\\'
 
-    loaded_images_list = open_images(dir_path)  # open_images() zwraca opened_images_list[]
-    while loaded_images_list is None:
-        dir_path = input("Podaj ścieżkę dostępu do folderu: ") + "\\"
-        loaded_images_list = open_images(dir_path)
-    else:
-        loaded_images_list = open_images(dir_path)
+    loaded_images_list = open_images(dir_path)
 
     files_names_list = get_files_names(dir_path)
-    if files_names_list is None:
-        dir_path = input("Podaj ścieżkę dostępu do folderu: ") + "\\"
-    else:
-        print("Wczytane pliki: " + str(files_names_list))
+    print("Wczytane pliki: " + str(files_names_list))
 
     choice = input("Wpisz 1, jeśli chcesz zmniejszyć obrazki lub 2, jeśli chcesz je zwiększyć: ")
+    percent = input("Wpisz liczbę procentów, o jakie ma się zmniejszyć lub zwiększyć obrazek: ")
 
-    if choice == "1":
-        decrease_images(loaded_images_list, files_names_list, dir_path)
+    for i in range(0, len(loaded_images_list)):
+        new_size = calculate_size(loaded_images_list[i], choice, percent)
+        new_image = resize_image(loaded_images_list[i], choice, percent, new_size)
+        save_image(files_names_list[i], dir_path, new_image)
 
-    if choice == "2":
-        increase_images(loaded_images_list, files_names_list, dir_path)
+    print("Zakończono. Zmieniono rozmiar " + str(len(files_names_list)) + " obrazków.")
 
 
 main()
