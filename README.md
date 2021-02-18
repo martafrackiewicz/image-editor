@@ -2,6 +2,7 @@
 
 ## About
 This is the application to change size of the images. You can pass a path to directory with images and increase or decrease their size by given percent.
+It was created in 2019, at the beginning of my programming learning.
 
 To-do list:
 * expose REST API
