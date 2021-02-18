@@ -19,8 +19,17 @@ def get_dir_path():
 
 
 def get_files_names(dir_path):
-    files_names_list = os.listdir(dir_path)
-    return files_names_list
+    ask_for_path = True
+    files_names = []
+    while ask_for_path:
+        try:
+            # dir_path = get_dir_path()
+            files_names = os.listdir(dir_path)
+        except OSError as err:
+            print("Niepoprawna ścieżka. Błąd: {}".format(err))
+        else:
+            ask_for_path = False
+    return files_names
 
 
 def get_choice():
@@ -76,30 +85,21 @@ def save_image(file_name, dir_path, new_image):
 
 def main():
 
-    files_names_list = []
-    ask_for_path = True
-    while ask_for_path:
-        try:
-            dir_path = get_dir_path()
-            files_names_list = get_files_names(dir_path)
-        except OSError as err:
-            print("Niepoprawna ścieżka. Błąd: {}".format(err))
-        else:
-            ask_for_path = False
-
-    print("Wczytane pliki: " + str(files_names_list))
+    dir_path = get_dir_path()
+    files_names = get_files_names(dir_path)
+    print("Wczytane pliki: " + str(files_names))
 
     choice = get_choice()
     percent = get_percent()
 
-    for file_name in files_names_list:
+    for file_name in files_names:
         file_path = dir_path + file_name
         opened_image = Image.open(file_path)
         new_size = calculate_size(opened_image, choice, percent)
         new_image = resize_image(opened_image, new_size)
         save_image(file_name, dir_path, new_image)
 
-    print("Zakończono. Zmieniono rozmiar " + str(len(files_names_list)) + " obrazków.")
+    print("Zakończono. Zmieniono rozmiar " + str(len(files_names)) + " obrazków.")
 
 
 main()
